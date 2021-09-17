@@ -37,19 +37,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public List<CategoryEntity> listWithTree() {
-        //1.查出所有分类
+        //1、查出所有分类
         List<CategoryEntity> entities = baseMapper.selectList(null);
-        //2.组装成父子的树形结构
-        //2.1)、找到所有的一级分类
-        List<CategoryEntity> level1Menus = entities.stream()
-                .filter(categoryEntity -> categoryEntity.getParentCid() == 0)
-                .map((menu)->{
-                    //2.2)、子菜单
-                    menu.setChildren(getChildrens(menu,entities));
-                    return menu;
-                })
-                .sorted(Comparator.comparingInt(CategoryEntity::getSort))
-                .collect(Collectors.toList());
+
+        //2、组装成父子的树形结构
+
+        //2.1）、找到所有的一级分类
+        List<CategoryEntity> level1Menus = entities.stream().filter(categoryEntity ->
+                categoryEntity.getParentCid() == 0
+        ).map((menu)->{
+            menu.setChildren(getChildrens(menu,entities));
+            return menu;
+        }).sorted((menu1,menu2)->{
+            return (menu1.getSort()==null?0:menu1.getSort()) - (menu2.getSort()==null?0:menu2.getSort());
+        }).collect(Collectors.toList());
+
         return level1Menus;
     }
 
@@ -70,13 +72,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     * @date: 2021/9/15 11:40 
     */
     private List<CategoryEntity> getChildrens(CategoryEntity root, List<CategoryEntity> all){
-        return all.stream()
-                .filter(categoryEntity -> categoryEntity.getParentCid().equals(root.getCatId()))
-                //找到子菜单
-                .peek(categoryEntity -> categoryEntity.setChildren(getChildrens(categoryEntity,all)))
-                //菜单排序
-                .sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ? 0 : menu.getSort())))
-                .collect(Collectors.toList());
+
+        List<CategoryEntity> children = all.stream().filter(categoryEntity -> {
+            return categoryEntity.getParentCid() == root.getCatId();
+        }).map(categoryEntity -> {
+            //1、找到子菜单
+            categoryEntity.setChildren(getChildrens(categoryEntity,all));
+            return categoryEntity;
+        }).sorted((menu1,menu2)->{
+            //2、菜单的排序
+            return (menu1.getSort()==null?0:menu1.getSort()) - (menu2.getSort()==null?0:menu2.getSort());
+        }).collect(Collectors.toList());
+
+        return children;
     }
 
 }
