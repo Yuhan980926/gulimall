@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
  * 
  * @author lixin
  * @email 708874882@qq.com
- * @date 2021-09-13 11:46:03
+ * @date 2022-01-18 17:49:04
  */
 @Mapper
 public interface WareOrderTaskDao extends BaseMapper<WareOrderTaskEntity> {
