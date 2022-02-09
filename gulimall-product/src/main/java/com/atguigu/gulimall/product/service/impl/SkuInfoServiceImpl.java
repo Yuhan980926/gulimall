@@ -3,6 +3,7 @@ package com.atguigu.gulimall.product.service.impl;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.SkuInfoDao;
+import com.atguigu.gulimall.product.entity.SkuImagesEntity;
 import com.atguigu.gulimall.product.entity.SkuInfoEntity;
 import com.atguigu.gulimall.product.service.SkuImagesService;
 import com.atguigu.gulimall.product.service.SkuInfoService;
@@ -54,7 +55,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             wrapper.eq("catalog_id", catelogId);
         }
         String brandId = (String) params.get("brandId");
-        if (!StringUtils.isEmpty(brandId) &&  !"0".equalsIgnoreCase(brandId)) {
+        if (!StringUtils.isEmpty(brandId) && !"0".equalsIgnoreCase(brandId)) {
             wrapper.eq("brand_id", brandId);
         }
         String min = (String) params.get("min");
@@ -66,7 +67,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             try {
                 BigDecimal bigDecimal = new BigDecimal("0");
                 int i = bigDecimal.compareTo(new BigDecimal("0"));
-                if (i == 1){
+                if (i == 1) {
                     wrapper.le("price", max);
                 }
             } catch (Exception e) {
@@ -87,7 +88,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     public List<SkuInfoEntity> geSkusBySpuId(Long spuId) {
 
 
-        return this.list( new QueryWrapper<SkuInfoEntity>().eq("spu_id",spuId));
+        return this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
     }
 
     @Override
@@ -97,7 +98,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         SkuInfoEntity info = getById(skuId);
         skuItemVo.setInfo(info);
         //2.获取sku的图片信息
-
+        List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
         //3.获取spu的销售属性组合
 
         //4.获取spu的介绍
